@@ -1,9 +1,11 @@
 package gocha
 
 import (
+	"math/rand"
 	"regexp"
 	"regexp/syntax"
 	"testing"
+	"time"
 )
 
 func TestNew(t *testing.T) {
@@ -91,7 +93,8 @@ func TestRandFromRange(t *testing.T) {
 	rs = append(rs, r1)
 	rs = append(rs, r2)
 
-	if result := randFromRange(rs); (result != 1) && (result != 2) && (result != 10) && (result != 11) {
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	if result := randFromRange(rs, rnd); (result != 1) && (result != 2) && (result != 10) && (result != 11) {
 		t.Errorf("result:%v must 1 or 2", result)
 	}
 }

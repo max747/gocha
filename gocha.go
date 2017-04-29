@@ -15,9 +15,6 @@ type Gocha interface {
 }
 
 func New(pattern string) (error, Gocha) {
-
-	rand.Seed(time.Now().UnixNano())
-
 	exp, err := syntax.Parse(pattern, syntax.Perl)
 	if err != nil {
 		return err, nil
@@ -36,6 +33,7 @@ func New(pattern string) (error, Gocha) {
 }
 
 func (g gocha) Gen() string {
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	prog := g.prog
 	pc := uint32(prog.Start)
@@ -55,7 +53,7 @@ func (g gocha) Gen() string {
 
 		case syntax.InstAlt:
 
-			if i := rand.Intn(2); i%2 == 1 {
+			if i := rnd.Intn(2); i%2 == 1 {
 				pc = prog.Inst[pc].Out
 			} else {
 				pc = prog.Inst[pc].Arg
@@ -76,7 +74,7 @@ func (g gocha) Gen() string {
 				rs = append(rs, r)
 			}
 
-			c := rune(randFromRange(rs))
+			c := rune(randFromRange(rs, rnd))
 			result = append(result, c)
 			pc = prog.Inst[pc].Out
 
@@ -93,7 +91,7 @@ func (g gocha) Gen() string {
 				rs = append(rs, r)
 			}
 
-			c := rune(randFromRange(rs))
+			c := rune(randFromRange(rs, rnd))
 			result = append(result, c)
 			pc = prog.Inst[pc].Out
 
@@ -117,7 +115,7 @@ func (g gocha) Gen() string {
 				rs = append(rs, r)
 			}
 
-			c := rune(randFromRange(rs))
+			c := rune(randFromRange(rs, rnd))
 
 			result = append(result, c)
 			pc = prog.Inst[pc].Out
@@ -135,19 +133,19 @@ type intRange struct {
 	b int
 }
 
-func randFromRange(rs []intRange) int {
+func randFromRange(rs []intRange, rnd *rand.Rand) int {
 
 	overallLen := 0
 
 	for _, r := range rs {
 		overallLen = overallLen + (r.b - r.a + 1)
 	}
-	index := rand.Intn(overallLen)
+	index := rnd.Intn(overallLen)
 	var result int
 	for _, r := range rs {
 
 		if (r.b - r.a) >= index {
-			result = rand.Intn(r.b-r.a+1) + r.a
+			result = rnd.Intn(r.b-r.a+1) + r.a
 			break
 		}
 

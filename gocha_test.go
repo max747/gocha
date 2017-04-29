@@ -96,9 +96,15 @@ func TestRandFromRange(t *testing.T) {
 	}
 }
 
-func BenchmarkGen(b *testing.B) {
+func BenchmarkNew(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, g := New(`.{1000}`)
+		New(`.{1000}`)
+	}
+}
+
+func BenchmarkGen(b *testing.B) {
+	_, g := New(`.{1000}`)
+	for i := 0; i < b.N; i++ {
 		g.Gen()
 	}
 }

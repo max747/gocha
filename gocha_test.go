@@ -76,8 +76,6 @@ func TestGen(t *testing.T) {
 	}
 }
 
-var RandFromRange = randFromRange
-
 func TestRandFromRange(t *testing.T) {
 	rs := []intRange{}
 	r1 := intRange{

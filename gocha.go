@@ -39,6 +39,24 @@ func (g gocha) Gen() string {
 	pc := uint32(prog.Start)
 	result := []rune{}
 
+	rsInstRuneAny := []intRange{
+		intRange{
+			a: 0,
+			b: 0x10ffff, // largest rune value
+		},
+	}
+
+	rsInstRuneAnyNotNL := []intRange{
+		intRange{
+			a: 0,
+			b: 9,
+		},
+		intRange{
+			a: 11,
+			b: 0x10ffff,
+		},
+	}
+
 	inProgress := true
 
 	for inProgress {
@@ -63,35 +81,12 @@ func (g gocha) Gen() string {
 			pc = prog.Inst[pc].Out
 
 		case syntax.InstRuneAny:
-			rs := []intRange{}
-			runes := []rune{0, 1114111}
-
-			for i := 0; i < len(runes); i = i + 2 {
-				r := intRange{
-					a: int(runes[i]),
-					b: int(runes[i+1]),
-				}
-				rs = append(rs, r)
-			}
-
-			c := rune(randFromRange(rs, rnd))
+			c := rune(randFromRange(rsInstRuneAny, rnd))
 			result = append(result, c)
 			pc = prog.Inst[pc].Out
 
 		case syntax.InstRuneAnyNotNL:
-			rs := []intRange{}
-			runes := []rune{0, 9, 11, 1114111}
-
-			for i := 0; i < len(runes); i = i + 2 {
-
-				r := intRange{
-					a: int(runes[i]),
-					b: int(runes[i+1]),
-				}
-				rs = append(rs, r)
-			}
-
-			c := rune(randFromRange(rs, rnd))
+			c := rune(randFromRange(rsInstRuneAnyNotNL, rnd))
 			result = append(result, c)
 			pc = prog.Inst[pc].Out
 
@@ -106,8 +101,8 @@ func (g gocha) Gen() string {
 			pc = prog.Inst[pc].Out
 
 		case syntax.InstRune:
-			rs := []intRange{}
-			for i := 0; i < len(prog.Inst[pc].Rune); i = i + 2 {
+			rs := make([]intRange, 0, len(prog.Inst[pc].Rune)/2)
+			for i := 0; i < len(prog.Inst[pc].Rune); i += 2 {
 				r := intRange{
 					a: int(prog.Inst[pc].Rune[i]),
 					b: int(prog.Inst[pc].Rune[i+1]),
